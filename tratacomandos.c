@@ -18,6 +18,7 @@ char *get_line(){
 
     return line;
 }
+
 char **get_args(char *line){
 
     int size = 64;
@@ -25,7 +26,8 @@ char **get_args(char *line){
     char *arg;
     char **args = malloc(size * sizeof(char *));
 
-    while((arg = strtok(line, " \n")) != NULL){
+    arg = strtok(line, " \t\r\n\a");
+    while(arg != NULL){
         args[index] = arg;
         index++;
 
@@ -38,6 +40,7 @@ char **get_args(char *line){
                 exit(EXIT_FAILURE);
             }
         }
+        arg = strtok(NULL, " \t\r\n\a");
     }
     return args;
 }
