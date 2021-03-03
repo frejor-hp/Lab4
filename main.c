@@ -1,36 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "tratacomandos.h"
+#include "executa.h"
 
 void loop();
-void print(char **arg, char *line);
 
 int main() {
 
     loop();
 
-    return 1;
+    return 0;
 }
 
 void loop(){
     char *line;
     char **args;
 
-    line = get_line();
-    args = get_args(line);
+    while(1){
+        printf("mabshell> ");
+        line = get_line();
+        args = get_args(line);
 
-    free(line);
-    free(args);
-}
+        if(args[0] == (void *)EOF) return;
 
-void print(char **args, char *line){
-    char *arg;
-    int index = 0;
+        execute(args);
 
-    printf("%s", line);
-
-    while((arg = args[index]) != NULL){
-        printf("%s", arg);
-        index++;
+        free(line);
+        free(args);
     }
 }
