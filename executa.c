@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <string.h>
 #include "executa.h"
 
@@ -37,8 +35,6 @@ void execute(char **args){
 }
 
 void launch(char  **args){
-    pid_t pid, wpid;
-    int status;
     int background = 0;
     int argCount = 0;
 
@@ -65,23 +61,14 @@ void launch(char  **args){
         execvp(args[0], args);
     }*/
 
-    if((pid = fork()) == 0){
-        if(strcmp(args[argCount - 1], "&") == 0){
-            printf("Asked to run on background thread");
+    if(strcmp(args[argCount - 1], "&") == 0){
+            printf("Asked to run on background thread\n");
             background = 1;
-            printf("Running on background thread");
-        } else{
-            printf("Asked to run on foreground thread");
-        }
-        execvp(args[0], args);
-    } else if(pid > 0){
-        do {
-            wpid = waitpid(pid, &status, WUNTRACED);
-        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+            printf("Running on background thread\n");
     } else{
-        perror("Error when forking");
+        printf("Asked to run on foreground thread\n");
     }
-
+    execvp(args[0], args);
 }
 
 int num_builtins(){
