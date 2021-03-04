@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "tratacomandos.h"
+#include "executacomandos.h"
 
 void loop();
 void print(char **arg, char *line);
@@ -18,6 +19,7 @@ void loop(){
 
     line = get_line();
     args = get_args(line);
+    lsh_execute(args);
 
     free(line);
     free(args);

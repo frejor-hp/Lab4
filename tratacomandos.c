@@ -6,16 +6,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tratacomandos.h"
+#include <sys/types.h> 
+#include <sys/wait.h>
+
 
 char *get_line(){
     char *line = NULL;
     size_t size = 0;
-
     if(getline(&line, &size, stdin) == -1){
         free(line);
         exit(EXIT_FAILURE);
     }
-
     return line;
 }
 
