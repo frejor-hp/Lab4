@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include "tratacomandos.h"
 #include "executa.h"
+#include <signal.h>
 
 void loop();
 
@@ -13,10 +14,23 @@ int main() {
     return 0;
 }
 
+void intHandler(sig_t s) {
+    printf("Peguei o ctrl c\n");
+}
+
+void stpHandler(sig_t s) {
+    printf("Peguei o ctrl z\n");
+}
+
 void loop(){
     char *line;
     char **args;
 
+	if(signal(SIGINT, intHandler) == SIG_ERR)
+		printf("Erro no SIGINT\n");
+	if(signal(SIGTSTP, stpHandler) == SIG_ERR)
+		printf("Erro no SIGTSTP\n");
+		
     while(1){
 
         char cwd[4096];
