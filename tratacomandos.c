@@ -25,7 +25,8 @@ char **get_args(char *line){
     char *arg;
     char **args = malloc(size * sizeof(char *));
 
-    while((arg = strtok(line, " \n")) != NULL){
+    arg = strtok(line, " \n");
+    while(arg != NULL){
         args[index] = arg;
         index++;
 
@@ -38,6 +39,7 @@ char **get_args(char *line){
                 exit(EXIT_FAILURE);
             }
         }
+        arg = strtok(NULL, " \n");
     }
     return args;
 }
