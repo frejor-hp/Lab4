@@ -6,7 +6,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
-#include "string.h"
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <string.h>
 #include "executa.h"
 
 char *builtin_str[] = {
@@ -35,6 +37,51 @@ void execute(char **args){
 }
 
 void launch(char  **args){
+    pid_t pid, wpid;
+    int status;
+    int background = 0;
+    int argCount = 0;
+
+    while((args[argCount] != NULL)){
+            argCount = argCount + 1;
+    }
+
+    /*if(strcmp(args[argCount - 1], "&") == 0){
+        printf("Asked to run on background thread");
+        pid = fork();
+        background = 1;
+        if(pid == 0){
+            printf("Running on background thread");
+            execvp(args[0], args);
+        } else if(pid > 0){
+            do {
+                wpid = waitpid(pid, &status, WUNTRACED);
+            } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+        } else {
+            perror("Error when forking");
+        }
+    } else {
+        printf("Asked to run on foreground thread");
+        execvp(args[0], args);
+    }*/
+
+    if((pid = fork()) == 0){
+        if(strcmp(args[argCount - 1], "&") == 0){
+            printf("Asked to run on background thread");
+            background = 1;
+            printf("Running on background thread");
+        } else{
+            printf("Asked to run on foreground thread");
+        }
+        execvp(args[0], args);
+    } else if(pid > 0){
+        do {
+            wpid = waitpid(pid, &status, WUNTRACED);
+        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    } else{
+        perror("Error when forking");
+    }
+
 }
 
 int num_builtins(){
