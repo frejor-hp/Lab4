@@ -7,19 +7,25 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "executa.h"
 
 char *builtin_str[] = {
-        "cd"
+        "cd",
+        "bg"
 };
 
 void (*builtin_func[]) (char **) = {
-        &cd
+        &cd,
+        &bg
 };
 
 void execute(char **args){
 
     int i;
+    pid_t pid, wpid;
+    int status;
 
     if (args[0] == NULL) {
         return;
@@ -31,7 +37,15 @@ void execute(char **args){
         }
     }
 
-    launch(args);
+    if((pid = fork()) == 0) {
+        launch(args);
+    } else if(pid > 0){
+        do {
+            wpid = waitpid(pid, &status, WUNTRACED);
+        } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+    } else{
+        perror("Error when forking");
+    }
 }
 
 void launch(char  **args){
@@ -41,25 +55,6 @@ void launch(char  **args){
     while((args[argCount] != NULL)){
             argCount = argCount + 1;
     }
-
-    /*if(strcmp(args[argCount - 1], "&") == 0){
-        printf("Asked to run on background thread");
-        pid = fork();
-        background = 1;
-        if(pid == 0){
-            printf("Running on background thread");
-            execvp(args[0], args);
-        } else if(pid > 0){
-            do {
-                wpid = waitpid(pid, &status, WUNTRACED);
-            } while (!WIFEXITED(status) && !WIFSIGNALED(status));
-        } else {
-            perror("Error when forking");
-        }
-    } else {
-        printf("Asked to run on foreground thread");
-        execvp(args[0], args);
-    }*/
 
     if(strcmp(args[argCount - 1], "&") == 0){
             printf("Asked to run on background thread\n");
@@ -80,4 +75,8 @@ void cd(char **args){
     else {
         if(chdir(args[1]) != 0) printf("%s\n", strerror(errno));
     }
+}
+
+void bg(char **args){
+
 }
