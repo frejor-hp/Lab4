@@ -30,8 +30,11 @@ void loop(){
     pid_t pid, wpid;
     int status;
 
-	signal(SIGINT, intHandler);
-	signal(SIGTSTP, stpHandler);
+	if(signal(SIGINT, intHandler) == SIG_ERR)
+		printf("Erro no SIGINT\n");
+	if(signal(SIGTSTP, stpHandler) == SIG_ERR)
+		printf("Erro no SIGTSTP\n");
+		
     while(1){
         printf("mabshell> ");
         line = get_line();
