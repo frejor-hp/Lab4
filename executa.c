@@ -17,13 +17,15 @@ int pid_list_index = -1;
 char *builtin_str[] = {
         "cd",
         "bg",
-        "jobs"
+        "jobs",
+        "fg"
 };
 
 void (*builtin_func[]) (char **) = {
         &cd,
         &bg, 
-        &jobs
+        &jobs,
+        &fg
 };
 
 void execute(char **args){
@@ -94,5 +96,23 @@ void jobs(char **args){
 
 void bg(char **args){
 
+}
+
+void fg(char **args){
+    int pid = (int)strtol(args[1], (char **)NULL, 10);
+
+    int found = 0;
+
+    for(int i=0; i<=pid_list_index; i++){
+        if(pid_list[i] == pid) {
+            found = 1;
+        }
+    }
+
+    if(found == 0){
+        printf("Processo %d não encontrado.\n", pid);
+    } else {
+         waitpid(pid, NULL, 0);
+    }
 }
 
