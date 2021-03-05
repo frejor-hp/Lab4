@@ -67,8 +67,11 @@ void launch(char  **args){
     }
 
     if((pid = fork()) == 0) {
-        execvp(args[0], args);
-        printf("Filho não terminado \n");
+        printf(args[1]);
+        if(execvp(args[0], args) == -1){
+            printf("%s\n", strerror(errno));
+            exit(EXIT_FAILURE);
+        };
     } else if(pid > 0){
         pid_list_index = pid_list_index + 1;
         pid_list[pid_list_index] = pid;
