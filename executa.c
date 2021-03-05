@@ -98,7 +98,9 @@ void cd(char **args){
 void jobs(char **args){
     if(args[1] == NULL){
         for(int i=0; i<=pid_list_index; i++){
-            printf("[%d] Processo %d\n", i, pid_list[i]);
+            if(pid_list[i] != 0){
+                printf("[%d] Processo %d\n", i, pid_list[i]);
+            }
         }
     } else {
         int processIndex = (int)strtol(args[1], (char **)NULL, 10);
@@ -140,6 +142,22 @@ void fg(char **args){
          if(waitpid(pid, &status, WUNTRACED) == -1){
                 printf("%s\n", strerror(errno));
          }
+    }
+}
+
+void handleFinishedPID(pid_t pid){
+    int index = -1;
+    
+    for(int i = 0; i <= pid_list_index; i++){
+        if(pid == pid_list[i]){
+            index = i;
+        }
+    }
+
+    if(index == pid_list_index){
+        pid_list_index = pid_list_index - 1;
+    } else {
+        pid_list[index] = 0;
     }
 }
 
