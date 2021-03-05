@@ -58,6 +58,8 @@ void launch(char  **args){
 
     if(strcmp(args[argCount - 1], "&") == 0){
             printf("Asked to run on background thread\n");
+            argCount = argCount - 1;
+            args[argCount] = NULL; 
             background = 1;
         
     } else{
@@ -65,12 +67,17 @@ void launch(char  **args){
     }
 
     if((pid = fork()) == 0) {
-        execvp(args[0], args);
+        if(execvp(args[0], args) == -1){
+            printf("%s\n", strerror(errno));
+            exit(EXIT_FAILURE);
+        };
     } else if(pid > 0){
         pid_list_index = pid_list_index + 1;
         pid_list[pid_list_index] = pid;
         if(background == 0){
-            wpid = waitpid(pid, &status, WUNTRACED);
+            do {
+                wpid = waitpid(pid, &status, WUNTRACED);
+            } while(!WIFEXITED(status) && !WIFSIGNALED(status));
         }
     } else{
         perror("Error when forking");
@@ -99,9 +106,18 @@ void bg(char **args){
 }
 
 void fg(char **args){
-    int pid = (int)strtol(args[1], (char **)NULL, 10);
+    int i = 0;
+    pid_t pid, wpid;
+    int status;
 
-    int found = 0;
+    while(args[1][i+1] != '\n'){
+        args[1][i] = args[1][i+1];
+        i++;
+    }
+
+    pid = (int)strtol(args[1], (char **)NULL, 10);
+
+    int found = 0;  
 
     for(int i=0; i<=pid_list_index; i++){
         if(pid_list[i] == pid) {
@@ -112,7 +128,9 @@ void fg(char **args){
     if(found == 0){
         printf("Processo %d não encontrado.\n", pid);
     } else {
-         waitpid(pid, NULL, 0);
+         if(waitpid(pid, &status, WUNTRACED) == -1){
+                printf("%s\n", strerror(errno));
+         }
     }
 }
 
