@@ -12,3 +12,4 @@ void launch(char  **args);
 int num_builtins();
 void cd(char **args);
 void bg(char **args);
+void jobs(char **args);
