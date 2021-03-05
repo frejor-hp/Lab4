@@ -99,9 +99,16 @@ void bg(char **args){
 }
 
 void fg(char **args){
+    int i = 0;
+
+    while(args[1][i+1] != '\n'){
+        args[1][i] = args[1][i+1];
+        i++;
+    }
+
     int pid = (int)strtol(args[1], (char **)NULL, 10);
 
-    int found = 0;
+    int found = 0;  
 
     for(int i=0; i<=pid_list_index; i++){
         if(pid_list[i] == pid) {
@@ -110,6 +117,7 @@ void fg(char **args){
     }
 
     if(found == 0){
+        printf("%d", pid);
         printf("Processo %d não encontrado.\n", pid);
     } else {
          waitpid(pid, NULL, 0);
