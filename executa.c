@@ -58,6 +58,8 @@ void launch(char  **args){
 
     if(strcmp(args[argCount - 1], "&") == 0){
             printf("Asked to run on background thread\n");
+            argCount = argCount - 1;
+            args[argCount] = '\n'; 
             background = 1;
         
     } else{
@@ -66,6 +68,7 @@ void launch(char  **args){
 
     if((pid = fork()) == 0) {
         execvp(args[0], args);
+        printf("Filho não terminado \n");
     } else if(pid > 0){
         pid_list_index = pid_list_index + 1;
         pid_list[pid_list_index] = pid;
@@ -117,7 +120,6 @@ void fg(char **args){
     }
 
     if(found == 0){
-        printf("%d", pid);
         printf("Processo %d não encontrado.\n", pid);
     } else {
          waitpid(pid, NULL, 0);
