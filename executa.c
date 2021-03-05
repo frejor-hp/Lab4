@@ -96,8 +96,17 @@ void cd(char **args){
 }
 
 void jobs(char **args){
-    for(int i=0; i<=pid_list_index; i++){
-        printf("[%d] Processo %d\n", i, pid_list[pid_list_index]);
+    if(args[1] == NULL){
+        for(int i=0; i<=pid_list_index; i++){
+            printf("[%d] Processo %d\n", i, pid_list[i]);
+        }
+    } else {
+        int processIndex = (int)strtol(args[1], (char **)NULL, 10);
+        if(processIndex > pid_list_index){
+            printf("Você digitou um valor acima do disponível\n");
+        } else {
+            printf("[%d] Processo %d\n", processIndex, pid_list[processIndex]);
+        }
     }
 }
 
