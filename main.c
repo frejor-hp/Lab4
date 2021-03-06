@@ -22,6 +22,10 @@ void stpHandler(sig_t s) {
     printf("Peguei o ctrl z\n");
 }
 
+void extHandler(sig_t s) {
+    printf("Saí\n");
+}
+
 void loop(){
     char *line;
     char **args;
@@ -30,6 +34,8 @@ void loop(){
 		printf("Erro no SIGINT\n");
 	if(signal(SIGTSTP, stpHandler) == SIG_ERR)
 		printf("Erro no SIGTSTP\n");
+    if(signal(SIGCHLD, extHandler) == SIG_ERR)
+		printf("Erro no SIGCHLD\n");
 		
     while(1){
 
