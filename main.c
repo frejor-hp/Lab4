@@ -23,7 +23,9 @@ void stpHandler(sig_t s) {
 }
 
 void extHandler(sig_t s) {
-    printf("Saí\n");
+    int pid = wait(NULL);
+    handleFinishedPID(pid);
+    printf("Removendo o processo com PID %d da minha listagem\n", pid);
 }
 
 void loop(){

@@ -121,27 +121,16 @@ void fg(char **args){
     pid_t pid, wpid;
     int status;
 
-    while(args[1][i+1] != '\n'){
-        args[1][i] = args[1][i+1];
-        i++;
-    }
+    
+    int index = (int)strtol(args[1], (char **)NULL, 10);
 
-    pid = (int)strtol(args[1], (char **)NULL, 10);
-
-    int found = 0;  
-
-    for(int i=0; i<=pid_list_index; i++){
-        if(pid_list[i] == pid) {
-            found = 1;
-        }
-    }
-
-    if(found == 0){
-        printf("Processo %d não encontrado.\n", pid);
-    } else {
+    if(index <= pid_list_index){
+        pid = pid_list[index];
          if(waitpid(pid, &status, WUNTRACED) == -1){
                 printf("%s\n", strerror(errno));
          }
+    } else {
+         printf("O valor %d é inválido\n", index);
     }
 }
 
