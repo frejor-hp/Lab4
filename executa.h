@@ -14,3 +14,6 @@ void cd(char **args);
 void bg(char **args);
 void jobs(char **args);
 void fg(char **args);
+void intHandler(sig_t s);
+void stpHandler(sig_t s);
+void extHandler(sig_t s);

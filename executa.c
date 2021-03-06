@@ -9,12 +9,27 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include "executa.h"
+#include <signal.h>
 
 pid_t pid_list[1000];
 int pid_list_index = -1;
 int bg_priority_list[1000];
 int bg_priority_index = -1;
+
+void intHandler(sig_t s) {
+    printf("\n");
+	fflush(stdout);
+	return;
+}
+
+void stpHandler(sig_t s) {
+    int pid = wait(NULL);
+}
+
+void extHandler(sig_t s){
+    int pid = wait(NULL);
+    handleFinishedPID(pid);
+}
 
 char *builtin_str[] = {
         "cd",
@@ -69,6 +84,10 @@ void launch(char  **args){
     }
 
     if((pid = fork()) == 0) {
+        if(signal(SIGINT, intHandler) == SIG_ERR)
+		        printf("Erro no SIGINT\n");
+        if(signal(SIGTSTP, stpHandler) == SIG_ERR)
+		        printf("Erro no SIGTSTP\n");
         if(execvp(args[0], args) == -1){
             printf("%s\n", strerror(errno));
             exit(EXIT_FAILURE);
@@ -79,7 +98,7 @@ void launch(char  **args){
         if(background == 0){
             do {
                 wpid = waitpid(pid, &status, WUNTRACED);
-            } while(!WIFEXITED(status) && !WIFSIGNALED(status));
+            } while(!WIFEXITED(status) && !WIFSIGNALED(status) && !WIFSTOPPED(status));
         }
     } else{
         perror("Error when forking");

@@ -5,6 +5,11 @@
 #include "executa.h"
 #include <signal.h>
 
+void extHandler(sig_t s){
+    int pid = wait(NULL);
+    handleFinishedPID(pid);
+}
+
 void loop();
 
 int main() {
@@ -14,32 +19,18 @@ int main() {
     return 0;
 }
 
-void intHandler(sig_t s) {
-    printf("Peguei o ctrl c\n");
-}
-
-void stpHandler(sig_t s) {
-    printf("Peguei o ctrl z\n");
-}
-
-void extHandler(sig_t s) {
-    int pid = wait(NULL);
-    handleFinishedPID(pid);
-    printf("Removendo o processo com PID %d da minha listagem\n", pid);
-}
-
 void loop(){
     char *line;
     char **args;
-
-	if(signal(SIGINT, intHandler) == SIG_ERR)
-		printf("Erro no SIGINT\n");
-	if(signal(SIGTSTP, stpHandler) == SIG_ERR)
-		printf("Erro no SIGTSTP\n");
-    if(signal(SIGCHLD, extHandler) == SIG_ERR)
-		printf("Erro no SIGCHLD\n");
 		
     while(1){
+
+        if(signal(SIGINT, SIG_IGN) == SIG_ERR)
+		        printf("Erro no SIGINT\n");
+        if(signal(SIGCHLD, extHandler) == SIG_ERR)
+		        printf("Erro no SIGCHLD\n");
+        if(signal(SIGTSTP, SIG_IGN) == SIG_ERR)
+		        printf("Erro no SIGTSTP\n");
 
         char cwd[4096];
         if (getcwd(cwd, sizeof(cwd)) == NULL) {
