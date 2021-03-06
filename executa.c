@@ -9,8 +9,9 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <signal.h>
 #include "executa.h"
+#include <signal.h>
+
 
 pid_t pid_list[1000];
 int pid_list_index = -1;
@@ -18,12 +19,15 @@ int bg_priority_list[1000];
 int bg_priority_index = -1;
 
 void intHandler(sig_t s) {
-    printf("\n");
-	fflush(stdout);
+    int pid = wait(NULL);
+    kill(pid, SIGINT);
+    fflush(stdout);
 }
 
 void stpHandler(sig_t s) {
     int pid = wait(NULL);
+    kill(pid, SIGSTOP);
+    fflush(stdout);
 }
 
 void extHandler(sig_t s){
@@ -84,9 +88,9 @@ void launch(char  **args){
     }
 
     if((pid = fork()) == 0) {
-        if(signal(SIGINT, intHandler) == SIG_ERR)
+        if(signal(SIGINT, SIG_DFL) == SIG_ERR)
 		        printf("Erro no SIGINT\n");
-        if(signal(SIGTSTP, stpHandler) == SIG_ERR)
+        if(signal(SIGTSTP, SIG_DFL) == SIG_ERR)
 		        printf("Erro no SIGTSTP\n");
         if(execvp(args[0], args) == -1){
             printf("%s\n", strerror(errno));
@@ -118,10 +122,12 @@ void cd(char **args){
 
 void jobs(char **args){
     if(args[1] == NULL){
-        for(int i=0; i<=pid_list_index; i++){
+        int i = 0;
+        while(pid_list[i] != NULL){
             if(pid_list[i] != 0){
                 printf("[%d] Processo %d\n", i, pid_list[i]);
             }
+            i++;
         }
     } else {
         int processIndex = (int)strtol(args[1], (char **)NULL, 10);
@@ -153,14 +159,7 @@ void fg(char **args){
     pid_t pid, wpid;
     int status;
 
-    if(bg_priority_list[0] != NULL && args[1] == NULL) {
-        pid = bg_priority_list[bg_priority_index];
-        bg_priority_list[bg_priority_index] = NULL;     
-        bg_priority_index--;
-        if(waitpid(pid, &status, WUNTRACED) == -1){
-                printf("%s\n", strerror(errno));
-        }
-    } else {
+    if(args[1] != NULL){   
         int index = (int)strtol(args[1], (char **)NULL, 10);
         if(index <= pid_list_index){
             pid = pid_list[index];
@@ -169,6 +168,13 @@ void fg(char **args){
             }
         } else {
             printf("O valor %d é inválido\n", index);
+        }
+    } else if(bg_priority_list[0] != NULL) {
+        pid = bg_priority_list[bg_priority_index];
+        bg_priority_list[bg_priority_index] = NULL;     
+        bg_priority_index--;
+        if(waitpid(pid, &status, WUNTRACED) == -1){
+                printf("%s\n", strerror(errno));
         }
     }
 }
