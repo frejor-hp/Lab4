@@ -30,9 +30,13 @@ void stpHandler(sig_t s) {
     fflush(stdout);
 }
 
-void extHandler(sig_t s){
-    int pid = wait(NULL);
-    handleFinishedPID(pid);
+void extHandler(int signo, siginfo_t *si, void *data){
+    int status;
+    unsigned long pid =(unsigned long)si->si_pid;
+    printf("Caí no extHandler com pid %d\n", pid);
+    if(pid > 0 ){
+        handleFinishedPID(pid);
+    }
 }
 
 char *builtin_str[] = {
@@ -184,15 +188,12 @@ void handleFinishedPID(pid_t pid){
     
     for(int i = 0; i <= pid_list_index; i++){
         if(pid == pid_list[i]){
+            printf("Achei o pid %d\n", pid);
             index = i;
         }
     }
 
-    if(index == pid_list_index){
-        pid_list_index = pid_list_index - 1;
-    } else {
-        pid_list[index] = 0;
-    }
+    pid_list[index] = 0;
 }
 
 

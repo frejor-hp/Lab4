@@ -6,11 +6,6 @@
 #include "executa.h"
 #include <signal.h>
 
-void extHandler(sig_t s){
-    int pid = wait(NULL);
-    handleFinishedPID(pid);
-}
-
 void loop();
 
 int main() {
