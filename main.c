@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #include "tratacomandos.h"
 #include "executa.h"
 #include <signal.h>

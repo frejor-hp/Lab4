@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include "executa.h"
 
 pid_t pid_list[1000];
 int pid_list_index = -1;
@@ -19,7 +20,6 @@ int bg_priority_index = -1;
 void intHandler(sig_t s) {
     printf("\n");
 	fflush(stdout);
-	return;
 }
 
 void stpHandler(sig_t s) {
