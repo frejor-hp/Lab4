@@ -13,6 +13,8 @@
 
 pid_t pid_list[1000];
 int pid_list_index = -1;
+int bg_priority_list[1000];
+int bg_priority_index = -1;
 
 char *builtin_str[] = {
         "cd",
@@ -113,24 +115,42 @@ void jobs(char **args){
 }
 
 void bg(char **args){
-
+    int i = 1;
+    int pid;
+    while(args[i] != NULL){
+        int j = 0;
+        while(args[i][j+1] != '\n'){
+            args[i][j] = args[i][j+1];
+            j++;
+        }
+        pid = (int)strtol(args[i], (char **)NULL, 10);
+        bg_priority_index = i-1; //To keep array starting from 0
+        bg_priority_list[bg_priority_index] = pid;
+        i++;
+    }
 }
 
 void fg(char **args){
-    int i = 0;
     pid_t pid, wpid;
     int status;
 
-    
-    int index = (int)strtol(args[1], (char **)NULL, 10);
-
-    if(index <= pid_list_index){
-        pid = pid_list[index];
-         if(waitpid(pid, &status, WUNTRACED) == -1){
+    if(bg_priority_list[0] != NULL && args[1] == NULL) {
+        pid = bg_priority_list[bg_priority_index];
+        bg_priority_list[bg_priority_index] = NULL;     
+        bg_priority_index--;
+        if(waitpid(pid, &status, WUNTRACED) == -1){
                 printf("%s\n", strerror(errno));
-         }
+        }
     } else {
-         printf("O valor %d é inválido\n", index);
+        int index = (int)strtol(args[1], (char **)NULL, 10);
+        if(index <= pid_list_index){
+            pid = pid_list[index];
+            if(waitpid(pid, &status, WUNTRACED) == -1){
+                printf("%s\n", strerror(errno));
+            }
+        } else {
+            printf("O valor %d é inválido\n", index);
+        }
     }
 }
 
@@ -149,4 +169,5 @@ void handleFinishedPID(pid_t pid){
         pid_list[index] = 0;
     }
 }
+
 
