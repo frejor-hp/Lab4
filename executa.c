@@ -33,7 +33,7 @@ void stpHandler(sig_t s) {
 void extHandler(int signo, siginfo_t *si, void *data){
     int status;
     unsigned long pid =(unsigned long)si->si_pid;
-    printf("Caí no extHandler com pid %d\n", pid);
+    printf("Caí no extHandler com pid %lu\n", pid);
     if(pid > 0 ){
         handleFinishedPID(pid);
     }
@@ -144,18 +144,30 @@ void jobs(char **args){
 }
 
 void bg(char **args){
-    int i = 1;
     int pid;
-    while(args[i] != NULL){
-        int j = 0;
-        while(args[i][j+1] != '\n'){
+    int encontrado;
+
+    for(int i = 1; args[i] != NULL; i++){
+        encontrado = 0;
+
+        if(args[i][0] != '%'){
+            printf("Formato errado, use %%pid\n");
+            continue;
+        }
+
+        for(int j = 0; args[i][j] != NULL; j++){
             args[i][j] = args[i][j+1];
-            j++;
         }
         pid = (int)strtol(args[i], (char **)NULL, 10);
-        bg_priority_index = i-1; //To keep array starting from 0
-        bg_priority_list[bg_priority_index] = pid;
-        i++;
+
+        for(int j = 0; j < pid_list_index; j++){
+            if(pid == pid_list[j]){
+                bg_priority_index = i-1; //To keep array starting from 0
+                bg_priority_list[bg_priority_index] = pid;
+                encontrado = 1;
+            }
+        }
+        if (!encontrado) printf("bg %i: Trabalho não existe\n", pid);
     }
 }
 
