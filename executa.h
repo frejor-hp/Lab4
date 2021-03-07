@@ -16,5 +16,5 @@ void jobs(char **args);
 void fg(char **args);
 void intHandler(sig_t s);
 void stpHandler(sig_t s);
-void extHandler(sig_t s);
+void extHandler(int signo, siginfo_t *si, void *data);
 void handleFinishedPID(pid_t pid);
