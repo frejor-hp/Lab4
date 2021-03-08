@@ -165,6 +165,7 @@ void bg(char **args){
                 bg_priority_index = i-1; //To keep array starting from 0
                 bg_priority_list[bg_priority_index] = pid;
                 encontrado = 1;
+                break;
             }
         }
         if (!encontrado) printf("bg %i: Trabalho não existe\n", pid);
